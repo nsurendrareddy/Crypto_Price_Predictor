@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crypto AI Predictor — Home</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dark-theme.css" id="dark-theme-link" disabled />
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Anime.js (optional for subtle flip easing) -->
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1222;
+      --bg-soft: #171a2f;
+      --card: #1b2040;
+      --text: #e9ecff;
+      --muted: #b5b9d9;
+      --accent: #79d2ff;
+      --accent-2: #c29dff;
+      --ring: rgba(121,210,255,0.35);
+      --coin-shadow: rgba(0,0,0,0.35);
+      --overlay: rgba(15,18,34,0.75);
+    }
+    [data-theme="light"] {
+      --bg: #f7f8ff;
+      --bg-soft: #eef1ff;
+      --card: #ffffff;
+      --text: #0f1222;
+      --muted: #3a3d55;
+      --accent: #246bfe;
+      --accent-2: #7a3cff;
+      --ring: rgba(36,107,254,0.25);
+      --coin-shadow: rgba(0,0,0,0.18);
+      --overlay: rgba(255,255,255,0.8);
+    }
+
+    body { background: radial-gradient(1200px 600px at 10% -10%, var(--bg-soft), var(--bg)); color: var(--text); min-height: 100vh; }
+
+    .navbar { background: linear-gradient(90deg, var(--card), var(--bg-soft)); box-shadow: 0 10px 30px -12px var(--ring); }
+    .navbar-brand { font-weight: 800; letter-spacing: 0.3px; }
+
+    /* Grid for 3-per-row on desktop */
+    .coin-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 24px; }
+    @media (min-width: 600px) { .coin-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 992px) { .coin-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .coin-card { position: relative; aspect-ratio: 1/1; border-radius: 999px; background: radial-gradient(100% 100% at 30% 20%, var(--card), var(--bg-soft)); box-shadow: inset 0 6px 18px var(--ring), 0 18px 40px -20px var(--coin-shadow); display: grid; place-items: center; overflow: hidden; cursor: pointer; transition: transform .25s ease, box-shadow .25s ease; border: 1px solid rgba(255,255,255,0.06); }
+    .coin-card:hover { transform: translateY(-4px) scale(1.03); box-shadow: inset 0 6px 24px var(--ring), 0 30px 70px -30px var(--coin-shadow); }
+
+    .coin-img { width: 56%; height: 56%; object-fit: contain; filter: drop-shadow(0 8px 16px var(--coin-shadow)); }
+    .coin-fallback { font-size: 2rem; font-weight: 700; opacity: .9; }
+
+    .coin-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, var(--overlay) 100%); opacity: 0; transition: opacity .2s ease; padding: 10px; text-align: center; }
+    .coin-card:hover .coin-overlay { opacity: 1; }
+    .coin-overlay .name { font-weight: 800; font-size: 1.1rem; }
+    .coin-overlay .price { font-size: .95rem; opacity: .9; }
+
+    /* Flip animation */
+    .flip-3d { transform-style: preserve-3d; }
+    .is-flipping { animation: coinFlip 800ms cubic-bezier(.2,.6,.2,1); }
+    @keyframes coinFlip {
+      0% { transform: perspective(800px) rotateY(0deg) scale(1); }
+      50% { transform: perspective(800px) rotateY(540deg) scale(1.06); }
+      100% { transform: perspective(800px) rotateY(1080deg) scale(1); }
+    }
+
+    .section-title { font-weight: 800; letter-spacing: .3px; }
+    .subtle { color: var(--muted); }
+
+    .spinner { width: 28px; height: 28px; border: 3px solid var(--ring); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .modal-content { background: var(--card); color: var(--text); border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 60px -20px var(--coin-shadow); }
+    .modal-header { border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .modal-footer { border-top: 1px solid rgba(255,255,255,0.08); }
+
+    .btn-accent { background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: #fff; border: 0; box-shadow: 0 10px 30px -12px var(--ring); }
+    .btn-accent:hover { filter: brightness(1.05); }
+
+    .badge-signal { background: rgba(121,210,255,0.15); color: var(--accent); border: 1px solid var(--ring); }
+
+    .price-chip { background: rgba(0,0,0,0.1); border: 1px dashed var(--ring); padding: 8px 12px; border-radius: 12px; }
+
+    .toast-container { z-index: 2000; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+        <i class="bi bi-graph-up-arrow"></i>
+        <span>Crypto AI Predictor</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="top_coins.html">Top Coins</a></li>
+          <li class="nav-item"><a class="nav-link" href="news.html">News</a></li>
+          <li class="nav-item"><a class="nav-link" href="portfolio.html">Portfolio</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="themeToggle">
+            <label class="form-check-label" for="themeToggle"><i class="bi bi-moon-stars"></i></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="py-5">
+    <div class="container">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+          <h1 class="section-title mb-1">Explore & Predict</h1>
+          <p class="subtle mb-0">Hover to see live prices • Click a coin to flip & open detailed predictions</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <div class="spinner" id="globalSpinner" title="Loading live prices..."></div>
+          <span class="subtle">Fetching live market data…</span>
+        </div>
+      </div>
+
+      <div id="coinGrid" class="coin-grid"></div>
+    </div>
+  </section>
+
+  <!-- Modal: Coin Details -->
+  <div class="modal fade" id="coinModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title d-flex align-items-center gap-2" id="coinModalTitle">
+            <img id="modalLogo" src="" alt="logo" width="28" height="28" style="object-fit:contain"/>
+            <span id="modalName">Coin</span>
+            <span class="badge rounded-pill badge-signal" id="modalSymbol"></span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-4">
+            <div class="col-12 col-lg-8">
+              <canvas id="priceChart" height="160"></canvas>
+              <div class="d-flex flex-wrap gap-3 mt-3">
+                <div class="price-chip"><small class="subtle">Pred (3M):</small> <strong id="pred3m">—</strong></div>
+                <div class="price-chip"><small class="subtle">Pred (6M):</small> <strong id="pred6m">—</strong></div>
+                <div class="price-chip"><small class="subtle">Pred (1Y):</small> <strong id="pred1y">—</strong></div>
+              </div>
+            </div>
+            <div class="col-12 col-lg-4">
+              <div class="mb-3">
+                <div class="subtle">Current Price</div>
+                <div class="fs-4 fw-bold" id="modalCurrent">—</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Add to Portfolio</label>
+                <div class="btn-group w-100 mb-2" role="group">
+                  <input type="radio" class="btn-check" name="addMode" id="modeQty" checked>
+                  <label class="btn btn-outline-secondary" for="modeQty">By Quantity</label>
+                  <input type="radio" class="btn-check" name="addMode" id="modeBudget">
+                  <label class="btn btn-outline-secondary" for="modeBudget">By Budget</label>
+                </div>
+                <div id="qtyGroup" class="input-group mb-2">
+                  <span class="input-group-text">Qty</span>
+                  <input type="number" min="0" step="0.00000001" class="form-control" id="inputQty" placeholder="e.g., 0.5">
+                </div>
+                <div id="budgetGroup" class="input-group mb-2" style="display:none;">
+                  <span class="input-group-text">Budget (₹)</span>
+                  <input type="number" min="0" step="0.01" class="form-control" id="inputBudget" placeholder="e.g., 5000">
+                </div>
+                <button class="btn btn-accent w-100" id="btnAddPortfolio"><i class="bi bi-plus-lg me-1"></i>Add</button>
+                <small class="d-block mt-2 subtle">Tip: You can manage your holdings on the Portfolio page.</small>
+              </div>
+
+              <hr/>
+              <div>
+                <h6 class="fw-bold mb-2">About</h6>
+                <p id="modalAbout" class="mb-0"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="appToast" class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toastBody">Added to portfolio.</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // ====== CONFIG ======
+    const INR_SYMBOL = '₹';
+    const COINS = [
+      { id: 'bitcoin', symbol: 'BTC', name: 'Bitcoin', img: 'images/btc.png' },
+      { id: 'ethereum', symbol: 'ETH', name: 'Ethereum', img: 'images/eth.png' },
+      { id: 'ripple', symbol: 'XRP', name: 'XRP', img: 'images/xrp.png' },
+      { id: 'tether', symbol: 'USDT', name: 'Tether', img: 'images/usdt.png' },
+      { id: 'binancecoin', symbol: 'BNB', name: 'BNB', img: 'images/bnb.png' },
+      { id: 'solana', symbol: 'SOL', name: 'Solana', img: 'images/sol.png' },
+      { id: 'usd-coin', symbol: 'USDC', name: 'USD Coin', img: 'images/usdc.png' },
+      { id: 'dogecoin', symbol: 'DOGE', name: 'Dogecoin', img: 'images/doge.png' },
+      { id: 'tron', symbol: 'TRX', name: 'TRON', img: 'images/trx.png' },
+      { id: 'cardano', symbol: 'ADA', name: 'Cardano', img: 'images/ada.png' },
+      { id: 'chainlink', symbol: 'LINK', name: 'Chainlink', img: 'images/link.png' },
+      { id: 'hyperliquid', symbol: 'HYPE', name: 'Hyperliquid', img: 'images/hype.png' },
+      { id: 'stellar', symbol: 'XLM', name: 'Stellar', img: 'images/xlm.png' },
+      { id: 'sui', symbol: 'SUI', name: 'Sui', img: 'images/sui.png' },
+      { id: 'bitcoin-cash', symbol: 'BCH', name: 'Bitcoin Cash', img: 'images/bch.png' },
+      { id: 'hedera-hashgraph', symbol: 'HBAR', name: 'Hedera', img: 'images/hbar.png' },
+      { id: 'ethena-usde', symbol: 'USDe', name: 'Ethena USDe', img: 'images/usde.png' },
+      { id: 'avalanche-2', symbol: 'AVAX', name: 'Avalanche', img: 'images/avax.png' },
+      { id: 'litecoin', symbol: 'LTC', name: 'Litecoin', img: 'images/ltc.png' },
+      { id: 'the-open-network', symbol: 'TON', name: 'Toncoin', img: 'images/ton.png' },
+    ];
+
+    // Short blurbs (4-5 lines) for About section
+    const ABOUT = {
+      BTC: 'Bitcoin is the first decentralized digital currency, secured by a global network of miners. It has a fixed supply of 21 million coins and is widely considered digital gold. Its primary use case is store of value and settlement. Volatility remains high, but adoption grows across institutions and retail.',
+      ETH: 'Ethereum is a programmable blockchain enabling smart contracts and decentralized applications. It transitioned to Proof of Stake, reducing energy usage. ETH powers DeFi, NFTs, and countless protocols. Scaling continues via rollups and L2 networks.',
+      XRP: 'XRP is designed for fast, low-cost cross-border payments. The XRP Ledger settles transactions in seconds with minimal fees. It targets enterprise remittances and liquidity provision use cases. Regulatory clarity has been a major theme for XRP.',
+      USDT: 'Tether (USDT) is a fiat-pegged stablecoin aiming to maintain a 1:1 value with the US dollar. It is used heavily for trading, remittances, and DeFi liquidity. Reserves and transparency are ongoing focal points for the market.',
+      BNB: 'BNB is the native token of BNB Chain, used for fees, staking, and ecosystem utilities. The network focuses on high throughput and low fees. BNB benefits from a large exchange-linked ecosystem and periodic token burns.',
+      SOL: 'Solana is a high-performance blockchain targeting low-latency and high throughput. It enables fast, inexpensive transactions supporting DeFi, NFTs, and on-chain games. Performance and uptime have improved alongside ecosystem growth.',
+      USDC:'USD Coin is a fully-reserved stablecoin governed by Centre. It targets transparency and compliance. USDC is widely used for settlement, DeFi, and cross-border transfers. It operates across multiple chains.',
+      DOGE:'Dogecoin began as a meme coin but evolved into a widely traded asset. It features low fees and fast blocks. Community culture and periodic catalysts drive interest and volatility. Utility efforts continue to expand.',
+      TRX:'TRON focuses on high throughput and efficient smart contracts. It is popular for stablecoin transfers and content platforms. TRX is used for resource staking and governance. The network maintains consistent activity.',
+      ADA:'Cardano emphasizes peer-reviewed research and formal methods. It aims for scalability, sustainability, and interoperability. ADA fuels smart contracts and governance. Ongoing upgrades expand dApp capabilities.',
+      LINK:'Chainlink provides decentralized oracle services, bringing off-chain data on-chain. LINK secures data feeds used across DeFi and beyond. It underpins reliable smart contract execution. Staking and CCIP expand its utility.',
+      HYPE:'Hyperliquid is associated with a derivatives ecosystem emphasizing performance and liquidity. The token underpins protocol incentives and governance within its trading stack. Its market footprint is growing among advanced users.',
+      XLM:'Stellar targets cross-border payments with low fees and quick finality. It partners with institutions for remittances and CBDC pilots. XLM is used for fees and network functions. The protocol emphasizes financial inclusion.',
+      SUI:'Sui is a high-throughput L1 based on Move. It prioritizes parallel execution and object-centric design. SUI supports fast dApps and games. Tooling and ecosystem are expanding.',
+      BCH:'Bitcoin Cash is a fork of Bitcoin focused on larger blocks and low fees for payments. It aims to serve as peer-to-peer electronic cash. Adoption includes merchants and payment processors.',
+      HBAR:'Hedera is a high-speed network using hashgraph consensus. It targets enterprise use cases like supply chain and identity. HBAR is used for fees, staking, and services. Governing Council includes major corporations.',
+      USDe:'Ethena USDe is a synthetic dollar aiming for stability through delta-neutral strategies. It is designed for on-chain settlement with yield features. Risk parameters and transparency are key considerations.',
+      AVAX:'Avalanche is a smart contract platform featuring subnets and fast finality. AVAX secures the network and pays fees. Ecosystem spans DeFi, NFTs, and enterprise. Interoperability and scaling are core focuses.',
+      LTC:'Litecoin is a long-standing peer-to-peer cryptocurrency. It offers faster block times than Bitcoin and low fees. Widely listed and supported for payments. It serves as a liquidity and transfer rail.',
+      TON:'Toncoin powers The Open Network, with integrations across Telegram ecosystem. It supports payments, DeFi, and digital identity. Growing retail distribution via mini-apps and wallets.',
+    };
+
+    const idBySymbol = Object.fromEntries(COINS.map(c => [c.symbol, c.id]));
+
+    // ====== THEME TOGGLE ======
+    const themeToggle = document.getElementById('themeToggle');
+    const setTheme = (mode) => { document.documentElement.setAttribute('data-theme', mode); localStorage.setItem('theme', mode); };
+    themeToggle.addEventListener('change', () => setTheme(themeToggle.checked ? 'dark' : 'light'));
+    (function initTheme(){ const saved = localStorage.getItem('theme') || 'light'; setTheme(saved); themeToggle.checked = saved === 'dark'; })();
+
+    // ====== PRICE FETCHING (CoinGecko) ======
+    async function fetchLivePricesInINR() {
+      const ids = COINS.map(c => c.id).join(',');
+      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=inr`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Price fetch failed');
+      return res.json();
+    }
+
+    function formatINR(n) {
+      try { return INR_SYMBOL + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(n); }
+      catch { return INR_SYMBOL + n.toFixed(2); }
+    }
+
+    // ====== GRID RENDER ======
+    const grid = document.getElementById('coinGrid');
+
+    function coinCardTemplate(c, livePrice) {
+      const priceText = livePrice ? formatINR(livePrice) : '—';
+      return `
+      <div class="coin-card flip-3d" data-symbol="${c.symbol}" data-id="${c.id}" data-name="${c.name}">
+        ${c.img ? `<img class="coin-img" src="${c.img}" alt="${c.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='grid';">` : ''}
+        <div class="coin-fallback d-none place-center">${c.symbol}</div>
+        <div class="coin-overlay">
+          <div>
+            <div class="name">${c.name} <span class="subtle">(${c.symbol})</span></div>
+            <div class="price">${priceText}</div>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    async function renderGrid() {
+      const prices = await fetchLivePricesInINR().catch(()=>({}));
+      grid.innerHTML = COINS.map(c => coinCardTemplate(c, prices?.[c.id]?.inr)).join('');
+      document.getElementById('globalSpinner').style.display = 'none';
+
+      // attach interactions
+      Array.from(document.querySelectorAll('.coin-card')).forEach(el => {
+        el.addEventListener('click', async () => {
+          // Flip animation like a real coin
+          el.classList.add('is-flipping');
+          // Wait for animation end (~800ms)
+          await new Promise(r => setTimeout(r, 820));
+          el.classList.remove('is-flipping');
+          // Open modal with details
+          const symbol = el.dataset.symbol; const id = el.dataset.id; const name = el.dataset.name;
+          openCoinModal({ symbol, id, name });
+        });
+      });
+    }
+
+    // ====== MODAL + CHART ======
+    let chart;
+    const coinModal = new bootstrap.Modal(document.getElementById('coinModal'));
+
+    async function openCoinModal({ symbol, id, name }) {
+  try {
+    // Header
+    document.getElementById('modalLogo').src = (COINS.find(c=>c.symbol===symbol)?.img) || '';
+    document.getElementById('modalName').textContent = name;
+    document.getElementById('modalSymbol').textContent = symbol;
+    document.getElementById('modalAbout').textContent = ABOUT[symbol] || '—';
+
+    // Current price
+    let current = null;
+    try {
+      const live = await fetchLivePricesInINR();
+      current = live?.[id]?.inr || null;
+    } catch {
+      console.warn("Live price fetch failed");
+    }
+    document.getElementById('modalCurrent').textContent = current ? formatINR(current) : '—';
+
+    // Historical data
+    let labels = [], prices = [];
+    try {
+      const hist = await fetchHistory(id);
+      labels = hist.labels;
+      prices = hist.prices;
+    } catch {
+      console.warn("History fetch failed");
+    }
+
+    // Predictions
+    const preds = computePredictions(labels, prices, current);
+    document.getElementById('pred3m').textContent = isNaN(preds.p3m) ? '—' : formatINR(preds.p3m);
+    document.getElementById('pred6m').textContent = isNaN(preds.p6m) ? '—' : formatINR(preds.p6m);
+    document.getElementById('pred1y').textContent = isNaN(preds.p1y) ? '—' : formatINR(preds.p1y);
+
+    // Chart
+    const ctx = document.getElementById('priceChart');
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Historical (INR)', data: prices, tension: 0.25, borderWidth: 2, pointRadius: 0 },
+          { label: 'Pred 3M', data: preds.series3m, borderDash: [6,4], borderWidth: 2, pointRadius: 0 },
+          { label: 'Pred 6M', data: preds.series6m, borderDash: [2,6], borderWidth: 2, pointRadius: 0 },
+          { label: 'Pred 1Y', data: preds.series1y, borderDash: [1,8], borderWidth: 2, pointRadius: 0 },
+        ]
+      },
+      options: {
+        responsive: true,
+        interaction: { mode: 'index', intersect: false },
+        scales: {
+          x: { ticks: { maxTicksLimit: 8 } },
+          y: { beginAtZero: false, ticks: { callback: v => INR_SYMBOL + new Intl.NumberFormat('en-IN').format(v) } }
+        },
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${formatINR(ctx.parsed.y)}` } }
+        }
+      }
+    });
+
+    // Add button handler
+    document.getElementById('btnAddPortfolio').onclick = () => addToPortfolio(symbol, name, current);
+
+    // Toggle qty/budget UI
+    const modeQty = document.getElementById('modeQty');
+    const modeBudget = document.getElementById('modeBudget');
+    modeQty.onchange = modeBudget.onchange = () => {
+      document.getElementById('qtyGroup').style.display = modeQty.checked ? '' : 'none';
+      document.getElementById('budgetGroup').style.display = modeBudget.checked ? '' : 'none';
+    };
+
+    coinModal.show();
+
+  } catch (err) {
+    console.error("Error opening modal:", err);
+    toast("Failed to load coin details. Please try again.");
+  }
+}
+
+
+    async function fetchHistory(id) {
+      // 365 days history in INR
+      const url = `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=inr&days=365&interval=daily`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('History fetch failed');
+      const data = await res.json();
+      const points = (data.prices || []).map(p => ({ t: new Date(p[0]), y: p[1] }));
+      const labels = points.map(p => p.t.toISOString().slice(0,10));
+      const prices = points.map(p => p.y);
+      return { labels, prices };
+    }
+
+    // ====== SIMPLE ML-ish PREDICTIONS (client-side fallback)
+    // Linear regression on log(price) vs time, extrapolate to +90d, +180d, +365d
+    function computePredictions(labels, prices, livePrice = null) {
+  if (!labels.length || !prices.length) 
+    return { p3m: NaN, p6m: NaN, p1y: NaN, series3m: [], series6m: [], series1y: [] };
+
+  const n = prices.length;
+  const xs = labels.map((_, i) => i); // day index
+  const ys = prices.map(p => Math.log(Math.max(p, 1e-9))); // log transform
+  const mean = arr => arr.reduce((a,b)=>a+b,0)/arr.length;
+  const xbar = mean(xs), ybar = mean(ys);
+
+  let num=0, den=0; 
+  for (let i=0; i<n; i++){ 
+    num += (xs[i]-xbar)*(ys[i]-ybar); 
+    den += (xs[i]-xbar)**2; 
+  }
+  const b1 = den === 0 ? 0 : (num/den); // slope
+  const b0 = ybar - b1*xbar; // intercept
+  const lastIdx = n-1;
+  const f = (k) => Math.exp(b0 + b1*k);
+
+  // Scale so last predicted price = actual live price
+  const modelLastPrice = f(lastIdx);
+  const adjustFactor = livePrice ? (livePrice / modelLastPrice) : 1;
+
+  const idx3m = lastIdx + 90, idx6m = lastIdx + 180, idx1y = lastIdx + 365;
+  const p3m = f(idx3m) * adjustFactor;
+  const p6m = f(idx6m) * adjustFactor;
+  const p1y = f(idx1y) * adjustFactor;
+
+  function buildSeries(hIdx) {
+    const ser = new Array(n).fill(null);
+    const steps = 30; 
+    const start = lastIdx, end = hIdx;
+    for (let s=0; s<=steps; s++) {
+      const k = Math.round(start + (end-start)*s/steps);
+      ser[k] = f(k) * adjustFactor;
+    }
+    return ser;
+  }
+
+  return {
+    p3m, p6m, p1y,
+    series3m: buildSeries(idx3m),
+    series6m: buildSeries(idx6m),
+    series1y: buildSeries(idx1y),
+  };
+}
+
+    
+
+    // ====== PORTFOLIO (localStorage) ======
+    function addToPortfolio(symbol, name, currentPrice) {
+      const modeQty = document.getElementById('modeQty').checked;
+      const qty = parseFloat(document.getElementById('inputQty').value || '0');
+      const budget = parseFloat(document.getElementById('inputBudget').value || '0');
+      let finalQty = 0;
+      if (modeQty) {
+        if (!qty || qty <= 0) return toast('Enter a valid quantity.');
+        finalQty = qty;
+      } else {
+        if (!budget || budget <= 0 || !currentPrice) return toast('Enter a valid budget (and ensure price loaded).');
+        finalQty = budget / currentPrice;
+      }
+      const key = 'portfolio';
+      const data = JSON.parse(localStorage.getItem(key) || '[]');
+      const idx = data.findIndex(x => x.symbol === symbol);
+      if (idx >= 0) data[idx].qty += finalQty; else data.push({ symbol, name, qty: finalQty });
+      localStorage.setItem(key, JSON.stringify(data));
+      toast(`${name} (${symbol}) added to portfolio.`);
+      document.getElementById('inputQty').value = '';
+      document.getElementById('inputBudget').value = '';
+    }
+
+    function toast(msg) {
+      const el = document.getElementById('appToast');
+      document.getElementById('toastBody').textContent = msg;
+      const t = new bootstrap.Toast(el);
+      t.show();
+    }
+
+    // ====== INIT ======
+    renderGrid();
+  </script>
+</body>
+</html>

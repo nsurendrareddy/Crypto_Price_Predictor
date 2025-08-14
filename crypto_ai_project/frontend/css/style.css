@@ -1,0 +1,93 @@
+/* style.css */
+
+/* Reset & base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f9f9f9;
+  color: #222;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Navbar */
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.nav-link.active {
+  font-weight: 600;
+  color: #0d6efd !important;
+}
+
+/* Coins grid and cards */
+.crypto-logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.coin-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.coin-symbol {
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: #888;
+}
+
+.description {
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* Card styling */
+.card {
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 12px rgb(0 0 0 / 0.15);
+}
+
+/* Contact Us iframe styling */
+section iframe {
+  max-width: 800px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+/* Buttons */
+.btn {
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+/* Responsive tweaks */
+@media (max-width: 576px) {
+  .crypto-logo {
+    width: 40px;
+    height: 40px;
+  }
+  .coin-name {
+    font-size: 1rem;
+  }
+  .coin-symbol {
+    font-size: 0.8rem;
+  }
+}

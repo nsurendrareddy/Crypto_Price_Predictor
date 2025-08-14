@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crypto AI Predictor — Portfolio</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dark-theme.css" id="dark-theme-link" disabled />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f1222;
+      --bg-soft: #171a2f;
+      --card: #1b2040;
+      --text: #e9ecff;
+      --muted: #b5b9d9;
+      --accent: #79d2ff;
+      --accent-2: #c29dff;
+      --ring: rgba(121,210,255,0.35);
+      --overlay: rgba(15,18,34,0.75);
+    }
+    [data-theme="light"] {
+      --bg: #f7f8ff;
+      --bg-soft: #eef1ff;
+      --card: #ffffff;
+      --text: #0f1222;
+      --muted: #3a3d55;
+      --accent: #246bfe;
+      --accent-2: #7a3cff;
+      --ring: rgba(36,107,254,0.25);
+      --overlay: rgba(255,255,255,0.8);
+    }
+    body {
+      background: radial-gradient(1200px 600px at 10% -10%, var(--bg-soft), var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .navbar {
+      background: linear-gradient(90deg, var(--card), var(--bg-soft));
+      box-shadow: 0 10px 30px -12px var(--ring);
+    }
+    .section-title { font-weight: 800; letter-spacing: .3px; }
+    .subtle { color: var(--muted); }
+    table {
+      background: var(--card);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    thead { background: var(--bg-soft); }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+        <i class="bi bi-graph-up-arrow"></i>
+        <span>Crypto AI Predictor</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="top_coins.html">Top Coins</a></li>
+          <li class="nav-item"><a class="nav-link" href="news.html">News</a></li>
+          <li class="nav-item"><a class="nav-link active" href="portfolio.html">Portfolio</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+        </ul>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="themeToggle">
+          <label class="form-check-label" for="themeToggle"><i class="bi bi-moon-stars"></i></label>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <section class="py-5">
+    <div class="container">
+      <h1 class="section-title mb-4">My Portfolio</h1>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle text-center">
+          <thead>
+            <tr>
+              <th>Coin</th>
+              <th>Quantity</th>
+              <th>Current Price</th>
+              <th>Pred (3M)</th>
+              <th>Pred (6M)</th>
+              <th>Pred (1Y)</th>
+              <th>Total Value</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="portfolio-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Delete Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content" style="background: var(--card); color: var(--text);">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Deletion</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to remove this coin from your portfolio?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" id="confirm-delete" class="btn btn-danger">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+    const setTheme = (mode) => { document.documentElement.setAttribute('data-theme', mode); localStorage.setItem('theme', mode); };
+    themeToggle.addEventListener('change', () => setTheme(themeToggle.checked ? 'dark' : 'light'));
+    (function initTheme(){ const saved = localStorage.getItem('theme') || 'light'; setTheme(saved); themeToggle.checked = saved === 'dark'; })();
+
+    const tbody = document.getElementById('portfolio-body');
+    let deleteIndex = null;
+
+    const COINS = JSON.parse(localStorage.getItem('COINS_META')) || []; // Optional meta storage
+
+    function formatINR(n) {
+      try { return '₹' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(n); }
+      catch { return '₹' + (n||0).toFixed(2); }
+    }
+
+    async function fetchPortfolioData() {
+      const portfolio = JSON.parse(localStorage.getItem('portfolio')) || [];
+      if (portfolio.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="subtle">No coins in your portfolio.</td></tr>`;
+        return;
+      }
+
+      const ids = portfolio.map(p => p.id).join(',');
+      const pricesRes = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=inr`);
+      const prices = await pricesRes.json();
+
+      tbody.innerHTML = '';
+      portfolio.forEach((item, i) => {
+        const current = prices?.[item.id]?.inr || 0;
+        const totalValue = current * item.qty;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${item.name} <span class="subtle">(${item.symbol})</span></td>
+          <td>${item.qty}</td>
+          <td>${formatINR(current)}</td>
+          <td>${formatINR(item.pred3m || 0)}</td>
+          <td>${formatINR(item.pred6m || 0)}</td>
+          <td>${formatINR(item.pred1y || 0)}</td>
+          <td>${formatINR(totalValue)}</td>
+          <td><button class="btn btn-sm btn-danger" onclick="confirmDelete(${i})"><i class="bi bi-trash"></i></button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function confirmDelete(index) {
+      deleteIndex = index;
+      new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    }
+
+    document.getElementById('confirm-delete').addEventListener('click', () => {
+      const portfolio = JSON.parse(localStorage.getItem('portfolio')) || [];
+      if (deleteIndex !== null) {
+        portfolio.splice(deleteIndex, 1);
+        localStorage.setItem('portfolio', JSON.stringify(portfolio));
+        fetchPortfolioData();
+        deleteIndex = null;
+        bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+      }
+    });
+
+    fetchPortfolioData();
+  </script>
+</body>
+</html>

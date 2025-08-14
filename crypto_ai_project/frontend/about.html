@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>About Cryptocurrencies - CryptoAI Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dark-theme.css" id="dark-theme-link" disabled />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #0f1222;
+      --bg-soft: #171a2f;
+      --card: #1b2040;
+      --text: #e9ecff;
+      --muted: #b5b9d9;
+      --accent: #79d2ff;
+      --ring: rgba(121,210,255,0.35);
+    }
+    [data-theme="light"] {
+      --bg: #f7f8ff;
+      --bg-soft: #eef1ff;
+      --card: #ffffff;
+      --text: #0f1222;
+      --muted: #3a3d55;
+      --accent: #246bfe;
+      --ring: rgba(36,107,254,0.25);
+    }
+    body {
+      background: radial-gradient(1200px 600px at 10% -10%, var(--bg-soft), var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .navbar {
+      background: linear-gradient(90deg, var(--card), var(--bg-soft));
+      box-shadow: 0 10px 30px -12px var(--ring);
+    }
+    .crypto-logo {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+    }
+    .coin-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .coin-symbol {
+      font-weight: 400;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .description {
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+        <i class="bi bi-graph-up-arrow"></i>
+        <span>Crypto AI Predictor</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="top_coins.html">Top Coins</a></li>
+          
+          <li class="nav-item"><a class="nav-link" href="news.html">News</a></li>
+          <li class="nav-item"><a class="nav-link" href="portfolio.html">Portfolio</a></li>
+          <li class="nav-item"><a class="nav-link active" href="about.html">About</a></li>
+        </ul>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="themeToggle">
+          <label class="form-check-label" for="themeToggle"><i class="bi bi-moon-stars"></i></label>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container py-5">
+    <h1 class="mb-4 text-center">About Cryptocurrencies</h1>
+    <div id="coins-grid" class="row g-4"></div>
+
+    <!-- Contact Us Section -->
+    <section class="mt-5">
+      <h2 class="mb-3 text-center">Contact Us</h2>
+      <div class="d-flex justify-content-center">
+        <iframe
+          src="https://docs.google.com/forms/d/e/1FAIpQLSeNOlOCD3Vpig_U7kCnk9EvFwmhZY3rAYj5pQ4pftmTL58zDQ/viewform?usp=header"
+          width="100%"
+          height="700"
+          frameborder="0"
+          marginheight="0"
+          marginwidth="0"
+          style="max-width: 800px; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;"
+          scrolling="yes"
+          title="Contact Us Form"
+        ></iframe>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const coins = [
+      { id: "bitcoin", symbol: "BTC", name: "Bitcoin", description: "Bitcoin is the first decentralized cryptocurrency..." },
+      { id: "ethereum", symbol: "ETH", name: "Ethereum", description: "Ethereum is a decentralized platform that enables smart contracts..." },
+      { id: "ripple", symbol: "XRP", name: "XRP", description: "XRP is a digital payment protocol aiming to enable fast..." },
+      { id: "tether", symbol: "USDT", name: "Tether", description: "Tether is a stablecoin pegged to the US dollar..." },
+      { id: "binancecoin", symbol: "BNB", name: "Binance Coin", description: "BNB is the native token of Binance exchange..." },
+      { id: "solana", symbol: "SOL", name: "Solana", description: "Solana is a high-performance blockchain..." },
+      { id: "usd-coin", symbol: "USDC", name: "USD Coin", description: "USD Coin is a stablecoin fully backed by US dollars..." },
+      { id: "dogecoin", symbol: "DOGE", name: "Dogecoin", description: "Dogecoin started as a meme coin but has gained popularity..." },
+      { id: "tron", symbol: "TRX", name: "TRON", description: "TRON is a blockchain platform focused on..." },
+      { id: "cardano", symbol: "ADA", name: "Cardano", description: "Cardano is a proof-of-stake blockchain platform..." },
+      { id: "chainlink", symbol: "LINK", name: "Chainlink", description: "Chainlink is a decentralized oracle network..." },
+      { id: "hyperliquid", symbol: "HYPE", name: "Hyperliquid", description: "Hyperliquid focuses on liquidity solutions..." },
+      { id: "stellar", symbol: "XLM", name: "Stellar", description: "Stellar facilitates cross-border payments..." },
+      { id: "sui", symbol: "SUI", name: "Sui", description: "Sui emphasizes scalability and developer-friendly tools..." },
+      { id: "bitcoin-cash", symbol: "BCH", name: "Bitcoin Cash", description: "Bitcoin Cash offers faster and cheaper transactions..." },
+      { id: "hedera-hashgraph", symbol: "HBAR", name: "Hedera Hashgraph", description: "Hedera offers a secure public distributed ledger..." },
+      { id: "ethena-usde", symbol: "USDe", name: "Ethena USDe", description: "Ethena USDe is a stablecoin variant..." },
+      { id: "avalanche", symbol: "AVAX", name: "Avalanche", description: "Avalanche is a platform for DeFi and enterprise apps..." },
+      { id: "litecoin", symbol: "LTC", name: "Litecoin", description: "Litecoin is a peer-to-peer cryptocurrency..." },
+      { id: "toncoin", symbol: "TON", name: "Toncoin", description: "Toncoin is the native cryptocurrency of The Open Network..." }
+    ];
+
+    async function fetchMarketData() {
+      const ids = coins.map(c => c.id).join(',');
+      try {
+        const res = await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&ids=${ids}&order=market_cap_desc&per_page=20&page=1&sparkline=false`);
+        return await res.json();
+      } catch (err) {
+        console.error("Error fetching market data:", err);
+        return [];
+      }
+    }
+
+    function createCoinCard(coin, marketInfo) {
+      return `
+        <div class="col-12 col-md-6 col-lg-4">
+          <div class="card h-100 shadow-sm">
+            <div class="d-flex align-items-center p-3">
+              <img class="crypto-logo me-3" src="images/${coin.symbol.toLowerCase()}.png" alt="${coin.name} Logo" />
+              <div>
+                <div class="coin-name">${coin.name}</div>
+                <div class="coin-symbol">${coin.symbol.toUpperCase()}</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="description">${coin.description}</p>
+              ${
+                marketInfo
+                  ? `<p><strong>Market Cap Rank:</strong> ${marketInfo.market_cap_rank || 'N/A'}</p>
+                     <p><strong>Current Price:</strong> ₹${marketInfo.current_price.toLocaleString()}</p>`
+                  : `<p><em>Market data unavailable</em></p>`
+              }
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function renderCoins() {
+      const coinsGrid = document.getElementById('coins-grid');
+      const marketData = await fetchMarketData();
+      coinsGrid.innerHTML = coins
+        .map(coin => {
+          const marketInfo = marketData.find(m => m.id === coin.id);
+          return createCoinCard(coin, marketInfo);
+        })
+        .join('');
+    }
+
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const setTheme = (mode) => {
+      document.documentElement.setAttribute('data-theme', mode);
+      localStorage.setItem('theme', mode);
+    };
+    themeToggle.addEventListener('change', () => setTheme(themeToggle.checked ? 'dark' : 'light'));
+    (function initTheme(){
+      const saved = localStorage.getItem('theme') || 'light';
+      setTheme(saved);
+      themeToggle.checked = saved === 'dark';
+    })();
+
+    window.addEventListener('DOMContentLoaded', renderCoins);
+  </script>
+</body>
+</html>
