@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crypto AI Predictor — Home</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="/static/css/dark-theme.css" id="dark-theme-link" disabled />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1222;
+      --bg-soft: #171a2f;
+      --card: #1b2040;
+      --text: #e9ecff;
+      --muted: #b5b9d9;
+      --accent: #79d2ff;
+      --accent-2: #c29dff;
+      --ring: rgba(121, 210, 255, 0.35);
+      --coin-shadow: rgba(0, 0, 0, 0.35);
+      --overlay: rgba(15, 18, 34, 0.75);
+    }
+
+    [data-theme="light"] {
+      --bg: #f7f8ff;
+      --bg-soft: #eef1ff;
+      --card: #ffffff;
+      --text: #0f1222;
+      --muted: #3a3d55;
+      --accent: #246bfe;
+      --accent-2: #7a3cff;
+      --ring: rgba(36, 107, 254, 0.25);
+      --coin-shadow: rgba(0, 0, 0, 0.18);
+      --overlay: rgba(255, 255, 255, 0.8);
+    }
+
+    body {
+      background: radial-gradient(1200px 600px at 10% -10%, var(--bg-soft), var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, var(--card), var(--bg-soft));
+      box-shadow: 0 10px 30px -12px var(--ring);
+    }
+
+    .navbar-brand {
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      color: var(--text) !important;
+    }
+     /* Fix for navbar links */
+    .navbar-nav .nav-link {
+      color: var(--text) !important;
+    }
+
+    .navbar-nav .nav-link.active {
+      color: var(--accent) !important;
+      font-weight: 600;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: var(--accent) !important;
+    }
+
+    /* Fix for navbar toggler in dark mode */
+    .navbar-toggler {
+      border-color: var(--muted);
+    }
+
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28233, 236, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='m4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+
+    [data-theme="light"] .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2815, 18, 34, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='m4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+
+    /* Custom Portfolio Table Styles */
+    .portfolio-container {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 0;
+      box-shadow: 0 20px 40px -10px var(--ring);
+      overflow: hidden;
+      border: 1px solid rgba(121, 210, 255, 0.1);
+    }
+
+    .portfolio-header {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      padding: 25px 30px;
+      color: white;
+    }
+
+    .portfolio-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .portfolio-grid {
+      padding: 20px;
+    }
+
+    .coin-card {
+      background: var(--bg-soft);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      border: 1px solid rgba(121, 210, 255, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .coin-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .coin-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px -5px var(--ring);
+      border-color: var(--accent);
+    }
+
+    .coin-card:hover::before {
+      opacity: 1;
+    }
+
+    .coin-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      padding-right: 50px;
+    }
+
+    .coin-identity {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .coin-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 18px;
+    }
+
+    .coin-details h4 {
+      margin: 0 0 5px 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .coin-symbol {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .coin-quantity {
+      text-align: right;
+    }
+
+    .quantity-label {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 5px;
+    }
+
+    .quantity-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      font-family: 'Monaco', 'Consolas', monospace;
+    }
+
+    .predictions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .prediction-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid rgba(121, 210, 255, 0.05);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .prediction-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+      opacity: 0.3;
+    }
+
+    .prediction-label {
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .prediction-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      font-family: 'Monaco', 'Consolas', monospace;
+      color: var(--text);
+    }
+
+    .current-value {
+      color: var(--accent);
+    }
+
+    .prediction-3m::before { background: #10b981; }
+    .prediction-6m::before { background: #f59e0b; }
+    .prediction-1y::before { background: #ef4444; }
+
+    .remove-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      opacity: 0.7;
+    }
+
+    .remove-btn:hover {
+      background: #ef4444;
+      color: white;
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .portfolio-summary {
+      background: var(--bg-soft);
+      margin: 20px;
+      border-radius: 16px;
+      padding: 25px;
+      border: 2px solid var(--accent);
+    }
+
+    .summary-title {
+      color: var(--accent);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .summary-item {
+      text-align: center;
+    }
+
+    .summary-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .summary-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-family: 'Monaco', 'Consolas', monospace;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    @media (max-width: 768px) {
+      .coin-info {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .coin-quantity {
+        text-align: left;
+      }
+
+      .predictions-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .portfolio-header {
+        padding: 20px;
+      }
+
+      .portfolio-grid {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+        <i class="bi bi-graph-up-arrow"></i><span>Crypto AI Predictor</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/top-coins">Top Coins</a></li>
+          <li class="nav-item"><a class="nav-link" href="/news">News</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/portfolio">Portfolio</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+        </ul>
+       <div class="d-flex align-items-center gap-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="themeToggle">
+            <label class="form-check-label" for="themeToggle"><i class="bi bi-moon-stars"></i></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="container py-5">
+    <h1 class="mb-4">Your Portfolio</h1>
+    
+    <div class="portfolio-container">
+      <div class="portfolio-header">
+        <h2><i class="bi bi-wallet2"></i> Holdings Overview</h2>
+      </div>
+      
+      <div class="portfolio-grid" id="portfolioGrid">
+        <!-- Coin cards will be inserted here -->
+      </div>
+
+      <div class="portfolio-summary">
+        <div class="summary-title">
+          <i class="bi bi-graph-up"></i> Portfolio Summary
+        </div>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="summary-label">Current Value</div>
+            <div class="summary-value" id="totNow">—</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">3 Month Prediction</div>
+            <div class="summary-value" id="tot3">—</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">6 Month Prediction</div>
+            <div class="summary-value" id="tot6">—</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-label">1 Year Prediction</div>
+            <div class="summary-value" id="tot12">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/main.js"></script>
+  <script>
+  (async function() {
+    const key = "portfolio";
+    const rows = JSON.parse(localStorage.getItem(key) || "[]");
+
+    // quick lookup maps
+    const idBySymbol   = Object.fromEntries(window.COIN_LIST.map(c => [c.symbol, c.id]));
+    const namesBySymbol = Object.fromEntries(window.COIN_LIST.map(c => [c.symbol, c.name]));
+
+    // preload current prices
+    const ids = rows.map(r => idBySymbol[r.symbol]).filter(Boolean);
+    let prices = {};
+    if (ids.length) {
+      const res = await fetch(`/api/simple_price?ids=${ids.join(",")}&vs_currency=inr`);
+      prices = await res.json();
+    }
+
+    async function getPrediction(id, sym) {
+      const r = await fetch(`/api/predict/${id}?symbol=${encodeURIComponent(sym)}&vs_currency=inr`);
+      return r.json();
+    }
+
+    const grid = document.getElementById("portfolioGrid");
+    let totNow = 0, tot3 = 0, tot6 = 0, tot12 = 0;
+
+    for (const r of rows) {
+      const id = idBySymbol[r.symbol];
+      if (!id) continue;
+
+      const cp = prices?.[id]?.inr || 0;
+      const p  = await getPrediction(id, r.symbol);
+
+      const nowVal = r.qty * cp;
+      const v3  = r.qty * (p.pred_3m || 0);
+      const v6  = r.qty * (p.pred_6m || 0);
+      const v12 = r.qty * (p.pred_1y || 0);
+
+      totNow += nowVal; tot3 += v3; tot6 += v6; tot12 += v12;
+
+      const coinCard = document.createElement("div");
+      coinCard.className = "coin-card";
+      coinCard.innerHTML = `
+        <button class="remove-btn" title="Remove from portfolio">
+          <i class="bi bi-x-lg"></i>
+        </button>
+        
+        <div class="coin-info">
+          <div class="coin-identity">
+            <div class="coin-icon">${(namesBySymbol[r.symbol] || r.symbol).charAt(0).toUpperCase()}</div>
+            <div class="coin-details">
+              <h4>${namesBySymbol[r.symbol] || r.symbol}</h4>
+              <span class="coin-symbol">${r.symbol}</span>
+            </div>
+          </div>
+          <div class="coin-quantity">
+            <div class="quantity-label">Holdings</div>
+            <div class="quantity-value">${r.qty.toFixed(8)}</div>
+          </div>
+        </div>
+
+        <div class="predictions-grid">
+          <div class="prediction-card">
+            <div class="prediction-label">Current Value</div>
+            <div class="prediction-value current-value">₹${new Intl.NumberFormat("en-IN").format(nowVal)}</div>
+          </div>
+          <div class="prediction-card prediction-3m">
+            <div class="prediction-label">3 Month</div>
+            <div class="prediction-value">${p.pred_3m ? "₹" + new Intl.NumberFormat("en-IN").format(v3) : "—"}</div>
+          </div>
+          <div class="prediction-card prediction-6m">
+            <div class="prediction-label">6 Month</div>
+            <div class="prediction-value">${p.pred_6m ? "₹" + new Intl.NumberFormat("en-IN").format(v6) : "—"}</div>
+          </div>
+          <div class="prediction-card prediction-1y">
+            <div class="prediction-label">1 Year</div>
+            <div class="prediction-value">${p.pred_1y ? "₹" + new Intl.NumberFormat("en-IN").format(v12) : "—"}</div>
+          </div>
+        </div>
+      `;
+
+      // remove handler
+      coinCard.querySelector(".remove-btn").onclick = () => {
+        if (confirm(`Remove ${r.symbol} from portfolio?`)) {
+          const arr = JSON.parse(localStorage.getItem(key) || "[]")
+                        .filter(x => x.symbol !== r.symbol);
+          localStorage.setItem(key, JSON.stringify(arr));
+          location.reload();
+        }
+      };
+
+      grid.appendChild(coinCard);
+    }
+
+    // totals
+    document.getElementById("totNow").textContent  = "₹" + new Intl.NumberFormat("en-IN").format(totNow);
+    document.getElementById("tot3").textContent    = "₹" + new Intl.NumberFormat("en-IN").format(tot3);
+    document.getElementById("tot6").textContent    = "₹" + new Intl.NumberFormat("en-IN").format(tot6);
+    document.getElementById("tot12").textContent   = "₹" + new Intl.NumberFormat("en-IN").format(tot12);
+  })();
+  </script>
+</body>
+</html>

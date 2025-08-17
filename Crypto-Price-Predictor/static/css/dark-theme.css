@@ -1,0 +1,4 @@
+/* dark-theme.css — if you want separate overrides; our inline page already handles data-theme switch */
+:root[data-theme="dark"] {
+  /* Custom dark overrides could go here */
+}

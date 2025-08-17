@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crypto AI Predictor — Home</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="/static/css/dark-theme.css" id="dark-theme-link" disabled />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1222;
+      --bg-soft: #171a2f;
+      --card: #1b2040;
+      --text: #e9ecff;
+      --muted: #b5b9d9;
+      --accent: #79d2ff;
+      --accent-2: #c29dff;
+      --ring: rgba(121, 210, 255, 0.35);
+      --coin-shadow: rgba(0, 0, 0, 0.35);
+      --overlay: rgba(15, 18, 34, 0.75);
+    }
+
+    [data-theme="light"] {
+      --bg: #f7f8ff;
+      --bg-soft: #eef1ff;
+      --card: #ffffff;
+      --text: #0f1222;
+      --muted: #3a3d55;
+      --accent: #246bfe;
+      --accent-2: #7a3cff;
+      --ring: rgba(36, 107, 254, 0.25);
+      --coin-shadow: rgba(0, 0, 0, 0.18);
+      --overlay: rgba(255, 255, 255, 0.8);
+    }
+
+    body {
+      background: radial-gradient(1200px 600px at 10% -10%, var(--bg-soft), var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, var(--card), var(--bg-soft));
+      box-shadow: 0 10px 30px -12px var(--ring);
+    }
+
+    .navbar-brand {
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    color: var(--text) !important;
+    }
+
+    /* Fix for navbar links */
+    .navbar-nav .nav-link {
+      color: var(--text) !important;
+    }
+
+    .navbar-nav .nav-link.active {
+      color: var(--accent) !important;
+      font-weight: 600;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: var(--accent) !important;
+    }
+
+    /* Fix for navbar toggler in dark mode */
+    .navbar-toggler {
+      border-color: var(--muted);
+    }
+
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28233, 236, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='m4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+
+    [data-theme="light"] .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2815, 18, 34, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='m4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+
+
+    .coin-grid {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 24px;
+    }
+
+    @media (min-width: 600px) {
+      .coin-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 992px) {
+      .coin-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .coin-card {
+      position: relative;
+      aspect-ratio: 1/1;
+      border-radius: 999px;
+      background: radial-gradient(100% 100% at 30% 20%, var(--card), var(--bg-soft));
+      box-shadow: inset 0 6px 18px var(--ring), 0 18px 40px -20px var(--coin-shadow);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .25s ease, box-shadow .25s ease;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .coin-card:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: inset 0 6px 24px var(--ring), 0 30px 70px -30px var(--coin-shadow);
+    }
+
+    .coin-img {
+      width: 56%;
+      height: 56%;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 16px var(--coin-shadow));
+    }
+
+    .coin-fallback {
+      font-size: 2rem;
+      font-weight: 700;
+      opacity: .9;
+    }
+
+    .coin-overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--overlay) 100%);
+      opacity: 0;
+      transition: opacity .2s ease;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .coin-card:hover .coin-overlay {
+      opacity: 1;
+    }
+
+    .coin-overlay .name {
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .coin-overlay .price {
+      font-size: .95rem;
+      opacity: .9;
+    }
+
+    .flip-3d {
+      transform-style: preserve-3d;
+    }
+
+    .is-flipping {
+      animation: coinFlip 800ms cubic-bezier(.2, .6, .2, 1);
+    }
+
+    @keyframes coinFlip {
+      0% {
+        transform: perspective(800px) rotateY(0deg) scale(1);
+      }
+
+      50% {
+        transform: perspective(800px) rotateY(540deg) scale(1.06);
+      }
+
+      100% {
+        transform: perspective(800px) rotateY(1080deg) scale(1);
+      }
+    }
+
+    .section-title {
+      font-weight: 800;
+      letter-spacing: .3px;
+    }
+
+    .subtle {
+      color: var(--muted);
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--ring);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .modal-content {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 60px -20px var(--coin-shadow);
+    }
+
+    .modal-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .modal-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-accent {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff;
+      border: 0;
+      box-shadow: 0 10px 30px -12px var(--ring);
+    }
+
+    .btn-accent:hover {
+      filter: brightness(1.05);
+    }
+
+    .badge-signal {
+      background: rgba(121, 210, 255, 0.15);
+      color: var(--accent);
+      border: 1px solid var(--ring);
+    }
+
+    .price-chip {
+      background: rgba(0, 0, 0, 0.1);
+      border: 1px dashed var(--ring);
+      padding: 8px 12px;
+      border-radius: 12px;
+    }
+
+    .toast-container {
+      z-index: 2000;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+        <i class="bi bi-graph-up-arrow"></i><span>Crypto AI Predictor</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/top-coins">Top Coins</a></li>
+          <li class="nav-item"><a class="nav-link" href="/news">News</a></li>
+          <li class="nav-item"><a class="nav-link" href="/portfolio">Portfolio</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="themeToggle">
+            <label class="form-check-label" for="themeToggle"><i class="bi bi-moon-stars"></i></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <section class="py-5">
+    <div class="container">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+          <h1 class="section-title mb-1">Explore & Predict</h1>
+          <p class="subtle mb-0">Hover to see live prices • Click a coin to flip & open detailed predictions</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <div class="spinner" id="globalSpinner" title="Loading live prices..."></div>
+          <span class="subtle">Fetching live market data…</span>
+        </div>
+      </div>
+      <div id="coinGrid" class="coin-grid"></div>
+    </div>
+  </section>
+
+  <div class="modal fade" id="coinModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title d-flex align-items-center gap-2" id="coinModalTitle">
+            <img id="modalLogo" src="" alt="logo" width="28" height="28" style="object-fit:contain" />
+            <span id="modalName">Coin</span>
+            <span class="badge rounded-pill badge-signal" id="modalSymbol"></span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-4">
+            <div class="col-12 col-lg-8">
+              <canvas id="priceChart" height="160"></canvas>
+              <div class="d-flex flex-wrap gap-3 mt-3">
+                <div class="price-chip"><small class="subtle">Pred (3M):</small> <strong id="pred3m">—</strong></div>
+                <div class="price-chip"><small class="subtle">Pred (6M):</small> <strong id="pred6m">—</strong></div>
+                <div class="price-chip"><small class="subtle">Pred (1Y):</small> <strong id="pred1y">—</strong></div>
+              </div>
+            </div>
+            <div class="col-12 col-lg-4">
+              <div class="mb-3">
+                <div class="subtle">Current Price</div>
+                <div class="fs-4 fw-bold" id="modalCurrent">—</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Add to Portfolio</label>
+                <div class="btn-group w-100 mb-2" role="group">
+                  <input type="radio" class="btn-check" name="addMode" id="modeQty" checked>
+                  <label class="btn btn-outline-secondary" for="modeQty">By Quantity</label>
+                  <input type="radio" class="btn-check" name="addMode" id="modeBudget">
+                  <label class="btn btn-outline-secondary" for="modeBudget">By Budget</label>
+                </div>
+                <div id="qtyGroup" class="input-group mb-2">
+                  <span class="input-group-text">Qty</span>
+                  <input type="number" min="0" step="0.00000001" class="form-control" id="inputQty"
+                    placeholder="e.g., 0.5">
+                </div>
+                <div id="budgetGroup" class="input-group mb-2" style="display:none;">
+                  <span class="input-group-text">Budget (₹)</span>
+                  <input type="number" min="0" step="0.01" class="form-control" id="inputBudget"
+                    placeholder="e.g., 5000">
+                </div>
+                <button class="btn btn-accent w-100" id="btnAddPortfolio"><i class="bi bi-plus-lg me-1"></i>Add</button>
+                <small class="d-block mt-2 subtle">Tip: You can manage your holdings on the Portfolio page.</small>
+              </div>
+              <hr />
+              <div>
+                <h6 class="fw-bold mb-2">About</h6>
+                <p id="modalAbout" class="mb-0"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="appToast" class="toast align-items-center text-bg-dark border-0" role="alert" aria-live="assertive"
+      aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toastBody">Added to portfolio.</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/main.js"></script>
+</body>
+
+</html>

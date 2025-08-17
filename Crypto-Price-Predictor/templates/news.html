@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crypto AI Predictor — Home</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="/static/css/dark-theme.css" id="dark-theme-link" disabled />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1222;
+      --bg-soft: #171a2f;
+      --card: #1b2040;
+      --text: #e9ecff;
+      --muted: #b5b9d9;
+      --accent: #79d2ff;
+      --accent-2: #c29dff;
+      --ring: rgba(121, 210, 255, 0.35);
+      --coin-shadow: rgba(0, 0, 0, 0.35);
+      --overlay: rgba(15, 18, 34, 0.75);
+    }
+
+    [data-theme="light"] {
+      --bg: #f7f8ff;
+      --bg-soft: #eef1ff;
+      --card: #ffffff;
+      --text: #0f1222;
+      --muted: #3a3d55;
+      --accent: #246bfe;
+      --accent-2: #7a3cff;
+      --ring: rgba(36, 107, 254, 0.25);
+      --coin-shadow: rgba(0, 0, 0, 0.18);
+      --overlay: rgba(255, 255, 255, 0.8);
+    }
+
+    body {
+      background: radial-gradient(1200px 600px at 10% -10%, var(--bg-soft), var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: linear-gradient(90deg, var(--card), var(--bg-soft));
+      box-shadow: 0 10px 30px -12px var(--ring);
+    }
+
+    .navbar-brand {
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      color: var(--text) !important;
+    }
+
+    /* Fix for navbar links */
+    .navbar-nav .nav-link {
+      color: var(--text) !important;
+    }
+
+    .navbar-nav .nav-link.active {
+      color: var(--accent) !important;
+      font-weight: 600;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: var(--accent) !important;
+    }
+
+    /* Fix for navbar toggler in dark mode */
+    .navbar-toggler {
+      border-color: var(--muted);
+    }
+
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28233, 236, 255, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='m4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+
+    [data-theme="light"] .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2815, 18, 34, 0.75%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='m4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+
+    .news-card {
+      display: flex;
+      gap: 16px;
+      border: 1px solid var(--bg-soft);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      background: var(--card);
+    }
+    .news-card:hover { 
+      transform: translateY(-4px); 
+      box-shadow: 0 8px 25px -8px var(--coin-shadow);
+    }
+    .news-card img {
+      width: 200px;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+    .news-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .news-meta {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .modal-content {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 60px -20px var(--coin-shadow);
+    }
+
+    .modal-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .modal-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Fix for close button in dark mode */
+    .btn-close {
+      background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23e9ecff'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+      border: 0;
+      opacity: 1;
+    }
+
+    [data-theme="light"] .btn-close {
+      background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+    }
+
+    /* Fix for modal title and content */
+    .modal-title {
+      color: var(--text) !important;
+    }
+
+    .modal-body {
+      color: var(--text) !important;
+    }
+
+    .modal-body p {
+      color: var(--text) !important;
+      margin-bottom: 1rem;
+    }
+
+    .text-muted {
+      color: var(--muted) !important;
+    }
+
+    /* Ensure modal text is visible in both themes */
+    #newsModalContent {
+      color: var(--text) !important;
+    }
+
+    #newsModalMeta {
+      color: var(--muted) !important;
+    }
+
+    /* Fix for theme toggle label */
+    .form-check-label {
+      color: var(--text);
+    }
+
+    /* Main heading */
+    h1 {
+      color: var(--text);
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+        <i class="bi bi-graph-up-arrow"></i><span>Crypto AI Predictor</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/top-coins">Top Coins</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/news">News</a></li>
+          <li class="nav-item"><a class="nav-link" href="/portfolio">Portfolio</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+        </ul>
+         <div class="d-flex align-items-center gap-3">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="themeToggle">
+            <label class="form-check-label" for="themeToggle"><i class="bi bi-moon-stars"></i></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- News Section -->
+  <main class="container py-5">
+    <h1 class="mb-4">📰 Latest Articles</h1>
+
+    <!-- Article 1 -->
+     <div class="row g-3">
+    <div class="col-12 col-md-6">
+    <div class="news-card" data-bs-toggle="modal" data-bs-target="#newsModal"
+         data-title="Ethereum Breaks $4,000 Barrier, Hits New Cycle Highs"
+         data-content="Ethereum breaking through $4000 resistance level with bullish momentum. The broader cryptocurrency market's health will play a crucial role in Ethereum's continued ascent, particularly Bitcoin's ability to maintain its own bullish momentum above $110,000. Correlation between major cryptocurrencies remains high, and any significant Bitcoin weakness could temporarily impact Ethereum's trajectory despite its strong fundamentals."
+         data-meta="Cointribune • about 2 hours ago">
+      <img src="/static/newsimages/1.png" alt="Energy battle">
+      <div>
+        <div class="news-title">Energy battle: AI and Bitcoin fight for access...</div>
+        <div class="news-meta">Cointribune • about 2 hours ago</div>
+      </div>
+    </div>
+    </div>
+
+    <!-- Article 2 -->
+
+    <div class="col-12 col-md-6">
+    <div class="news-card" data-bs-toggle="modal" data-bs-target="#newsModal"
+         data-title="SEC and Ripple End Historic 5-Year Legal Battle with $125M Settlement"
+         data-content="SEC and Ripple reach historic $125 million settlement ending 5-year legal battle
+August 7, 2025 - In a landmark development that has sent ripples throughout the cryptocurrency industry, the Securities and Exchange Commission (SEC) and Ripple Labs have officially concluded their contentious five-year legal battle with a $125 million settlement agreement, marking the end of one of the most closely watched regulatory cases in crypto history. 
+The resolution of this case represents a watershed moment for the cryptocurrency industry, providing much-needed regulatory clarity for XRP and potentially setting important precedents for how other digital assets might be classified under U.S. securities law. The settlement terms, while substantial, were significantly lower than the SEC's initial demands and have been viewed favorably by both the crypto community and legal experts.
+Case Background and Timeline"
+         data-meta="Bitcoinist • about 2 hours ago">
+      <img src="/static/newsimages/2.png" alt="Bitcoin Treasury">
+      <div>
+        <div class="news-title">Bitcoin Treasury Milestone: Top Win International...</div>
+        <div class="news-meta">Bitcoinist • about 2 hours ago</div>
+      </div>
+    </div>
+    </div>
+
+    <!-- Article 3 -->
+    <div class="col-12 col-md-6">
+    <div class="news-card" data-bs-toggle="modal" data-bs-target="#newsModal"
+         data-title="Trump Signs Executive Order Allowing Crypto in 401(k) Plans"
+         data-content="Trump signs executive order allowing cryptocurrency investments in 401k retirement plans
+August 8, 2025 - President Donald Trump has signed a groundbreaking executive order directing the Department of Labor to permit cryptocurrencies, private equity, and alternative investments in 401(k) retirement plans, potentially opening access to nearly $9 trillion in defined-contribution assets and marking a historic shift toward mainstream crypto adoption. 
+This executive action represents one of the most significant policy developments for cryptocurrency integration into traditional financial systems since Bitcoin's inception. The order could fundamentally alter the retirement savings landscape for millions of Americans while positioning the United States as a global leader in cryptocurrency adoption at the institutional level.The Investment Company Institute, which represents mutual fund companies, has called for comprehensive regulations to protect retirement savers while acknowledging the potential benefits of expanded investment options. The organization has emphasized the need for clear guidelines on fiduciary responsibilities when offering cryptocurrency investments."
+         data-meta="NewsBTC • about 3 hours ago">
+      <img src="/static/newsimages/3.png" alt="Trump-backed Bitcoin">
+      <div>
+        <div class="news-title">Trump-Backed American Bitcoin Targets Asian Companies</div>
+        <div class="news-meta">NewsBTC • about 3 hours ago</div>
+      </div>
+    </div>
+    </div>
+    <!-- Article 4 -->
+    <div class="col-12 col-md-6">
+    <div class="news-card" data-bs-toggle="modal" data-bs-target="#newsModal"
+         data-title="Bitcoin Targets $140K Following Gold's Breakout Pattern"
+         data-content="Bitcoin targets $140K following gold's breakout pattern with bullish momentum
+August 10, 2025 - Bitcoin is exhibiting remarkable technical similarities to gold's price structure before its historic breakout, with analysts suggesting that if BTC follows the same trajectory, the cryptocurrency could reach $140,000 by month-end, representing a significant acceleration of the current bull market cycle. 
+Trading at approximately $118,699 as of August 10, Bitcoin has demonstrated exceptional resilience and consistent upward momentum throughout 2025, gaining 25.2% year-to-date. This performance has positioned Bitcoin as the second-best performing major asset class of 2025, trailing only gold's impressive 29% gain, and has captured the attention of institutional investors and technical analysts worldwide."
+         data-meta="NewsBTC • about 3 hours ago">
+      <img src="/static/newsimages/4.png" alt="Trump-backed Bitcoin">
+      <div>
+        <div class="news-title">Trump-Backed American Bitcoin Targets Asian Companies</div>
+        <div class="news-meta">NewsBTC • about 3 hours ago</div>
+      </div>
+    </div>
+    </div>
+
+    <!-- Article 5 -->
+    <div class="col-12 col-md-6">
+    <div class="news-card" data-bs-toggle="modal" data-bs-target="#newsModal"
+         data-title="Bo Hines Steps Down as White House Crypto Council Executive Director"
+         data-content="Bo Hines steps down as White House Crypto Council Executive Director
+August 8, 2025 - In a surprising development that has sent ripples through Washington's cryptocurrency policy circles, Bo Hines announced his resignation as Executive Director of the White House Crypto Council, citing his intention to return to the private sector after successfully helping establish America's framework for digital asset leadership. 
+Hines' departure marks the end of a transformative tenure during which he worked closely with AI & Crypto Czar David Sacks to position the United States as the crypto capital of the world and establish comprehensive regulatory frameworks that have shaped the industry's trajectory throughout 2025. His resignation comes at a critical juncture as the administration continues implementing groundbreaking cryptocurrency policies, including the recent executive order allowing crypto investments in 401(k) plans."
+         data-meta="NewsBTC • about 3 hours ago">
+      <img src="/static/newsimages/5.png" alt="Trump-backed Bitcoin">
+      <div>
+        <div class="news-title">Trump-Backed American Bitcoin Targets Asian Companies</div>
+        <div class="news-meta">NewsBTC • about 3 hours ago</div>
+      </div>
+    </div>
+    </div>
+
+    <!-- Article 6 -->
+    <div class="col-12 col-md-6">
+    <div class="news-card" data-bs-toggle="modal" data-bs-target="#newsModal"
+         data-title="World Liberty Financial Eyes $1.5B Public Company for WLFI Tokens"
+         data-content="World Liberty Financial targets $1.5 billion funding through WLFI token public company structure
+August 8, 2025 - World Liberty Financial, the cryptocurrency venture backed by the Trump family, is actively exploring the creation of a publicly traded company designed to hold WLFI tokens, targeting approximately $1.5 billion in funding as the project seeks to establish itself as a major player in the decentralized finance ecosystem. 
+This ambitious fundraising initiative represents one of the most significant cryptocurrency-related public offerings ever contemplated and could set important precedents for how digital asset companies structure their public market presence. The venture's high-profile backing and substantial funding target have attracted attention from major institutional investors and could serve as a catalyst for broader cryptocurrency market adoption.he timing of World Liberty Financial's fundraising initiative coincides with several favorable market conditions that could enhance its success prospects. The approval and strong "
+         data-meta="NewsBTC • about 3 hours ago">
+      <img src="/static/newsimages/6.png" alt="Trump-backed Bitcoin">
+      <div>
+        <div class="news-title">Trump-Backed American Bitcoin Targets Asian Companies</div>
+        <div class="news-meta">NewsBTC • about 3 hours ago</div>
+      </div>
+    </div>
+    </div>
+
+    <!-- Article 7 -->
+    <div class="col-12 col-md-6">
+    <div class="news-card" data-bs-toggle="modal" data-bs-target="#newsModal"
+         data-title="Global Crypto Market Cap Hits $3.95 Trillion"
+         data-content="Global cryptocurrency market reaches historic $3.95 trillion market capitalization
+August 10, 2025 - The global cryptocurrency market has achieved a historic milestone, reaching a total market capitalization of $3.95 trillion, representing a 0.34% increase over the past 24 hours and cementing 2025 as a landmark year for digital asset adoption and institutional acceptance. 
+This achievement represents the culmination of sustained growth throughout 2025, driven by unprecedented institutional adoption, regulatory clarity, and technological advancement across the cryptocurrency ecosystem. The $3.95 trillion figure positions the cryptocurrency market as one of the world's largest asset classes, comparable to the combined market capitalizations of several major stock exchanges and representing nearly 4% of global financial assets."
+         data-meta="NewsBTC • about 3 hours ago">
+      <img src="/static/newsimages/7.png" alt="Trump-backed Bitcoin">
+      <div>
+        <div class="news-title">Trump-Backed American Bitcoin Targets Asian Companies</div>
+        <div class="news-meta">NewsBTC • about 3 hours ago</div>
+      </div>
+    </div>
+    </div>
+    <!-- Article 8 -->
+    <div class="col-12 col-md-6">
+    <div class="news-card" data-bs-toggle="modal" data-bs-target="#newsModal"
+         data-title=". Massive Crypto Liquidations Total $452 Million"
+         data-content="Cryptocurrency markets experience $452 million in liquidations across major exchanges
+August 9, 2025 - The cryptocurrency market experienced significant turbulence as liquidations reached a staggering $452 million over a 24-hour period, highlighting the continued volatility inherent in digital asset markets despite their recent maturation and institutional adoption.binance
+The massive liquidation event underscores the high-leverage trading that continues to characterize cryptocurrency markets, where rapid price movements can force the closure of leveraged positions, creating cascading effects that amplify market volatility. This event serves as a reminder that despite the growing institutional presence and regulatory clarity in cryptocurrency markets, the fundamental characteristics that create both opportunity and risk remain intact."
+         data-meta="NewsBTC • about 3 hours ago">
+      <img src="/static/newsimages/8.png" alt="Trump-backed Bitcoin">
+      <div>
+        <div class="news-title">Trump-Backed American Bitcoin Targets Asian Companies</div>
+        <div class="news-meta">NewsBTC • about 3 hours ago</div>
+      </div>
+    </div>
+    </div>
+    <!-- Article 9 -->
+    <div class="col-12 col-md-6">
+    <div class="news-card" data-bs-toggle="modal" data-bs-target="#newsModal"
+         data-title="El Salvador Advances Bitcoin Investment Banking Legislation"
+         data-content="El Salvador advances Bitcoin investment banking legislation to strengthen crypto infrastructure
+August 10, 2025 - El Salvador continues to solidify its position as the world's most Bitcoin-friendly nation by advancing comprehensive legislation designed to establish Bitcoin investment banking services, marking another milestone in the country's revolutionary approach to cryptocurrency integration and financial system modernization. 
+This legislative initiative represents the latest evolution in El Salvador's groundbreaking Bitcoin strategy, which began with the historic decision to make Bitcoin legal tender in September 2021. The new banking legislation aims to create a comprehensive framework for Bitcoin-based financial services, potentially transforming El Salvador into a global hub for cryptocurrency banking and investment services."
+         data-meta="NewsBTC • about 3 hours ago">
+      <img src="/static/newsimages/9.png" alt="Trump-backed Bitcoin">
+      <div>
+        <div class="news-title">Trump-Backed American Bitcoin Targets Asian Companies</div>
+        <div class="news-meta">NewsBTC • about 3 hours ago</div>
+      </div>
+    </div>
+    </div>
+    <!-- Article 10 -->
+    <div class="col-12 col-md-6">
+    <div class="news-card" data-bs-toggle="modal" data-bs-target="#newsModal"
+         data-title="Binance Alpha Airdrop Phase 1 Begins"
+         data-content="Binance launches Alpha Airdrop Phase 1 with Alpha Points reward system
+August 10, 2025 - Binance, the world's largest cryptocurrency exchange, has officially launched Phase 1 of its highly anticipated Alpha Airdrop program, allowing users with at least 237 Alpha Points to claim rewards in what represents one of the most significant token distribution events in recent cryptocurrency history.binance
+tegrity of the token distribution process while ensuring that only eligible users can claim rewards. Multi-layer verification systems prevent duplicate claims and unauthorized access while maintaining user experience quality during high-traffic claiming periods.
+"
+         data-meta="NewsBTC • about 3 hours ago">
+      <img src="/static/newsimages/10.png" alt="Trump-backed Bitcoin">
+      <div>
+        <div class="news-title">Trump-Backed American Bitcoin Targets Asian Companies</div>
+        <div class="news-meta">NewsBTC • about 3 hours ago</div>
+      </div>
+    </div>
+    </div>
+  </div>
+  </main>
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="newsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content p-4">
+        <div class="modal-header border-0">
+          <h5 class="modal-title" id="newsModalTitle" style="color: #e9ecff;">Loading...</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="newsModalContent" style="color: #e9ecff; display: block; margin-bottom: 1rem; font-size: 1rem; line-height: 1.5;">Loading content...</p>
+          <small class="text-muted" id="newsModalMeta" style="color: #b5b9d9;">Loading...</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/main.js"></script>
+  <script>
+    // Fill modal dynamically
+    document.addEventListener('DOMContentLoaded', function() {
+      const newsModal = document.getElementById('newsModal');
+      
+      if (newsModal) {
+        newsModal.addEventListener('show.bs.modal', function(event) {
+          try {
+            console.log('Modal event triggered');
+            const button = event.relatedTarget;
+            console.log('Button element:', button);
+            
+            if (!button) {
+              console.error('No button found');
+              return;
+            }
+            
+            // Get the content from data attributes
+            const title = button.getAttribute('data-title');
+            const content = button.getAttribute('data-content');
+            const meta = button.getAttribute('data-meta');
+            
+            console.log('Data attributes:', { 
+              title: title ? title.substring(0, 50) + '...' : 'NULL',
+              content: content ? content.substring(0, 50) + '...' : 'NULL',
+              meta: meta || 'NULL'
+            });
+            
+            // Update modal content
+            const titleElement = document.getElementById('newsModalTitle');
+            const contentElement = document.getElementById('newsModalContent');
+            const metaElement = document.getElementById('newsModalMeta');
+            
+            if (titleElement && title) {
+              titleElement.textContent = title;
+              console.log('Title updated');
+            }
+            
+            if (contentElement && content) {
+              contentElement.textContent = content;
+              console.log('Content updated');
+            }
+            
+            if (metaElement && meta) {
+              metaElement.textContent = meta;
+              console.log('Meta updated');
+            }
+            
+          } catch (error) {
+            console.error('Error in modal handler:', error);
+          }
+        });
+      }
+
+      // Theme toggle functionality
+      const themeToggle = document.getElementById('themeToggle');
+      const html = document.documentElement;
+      
+      if (themeToggle && html) {
+        themeToggle.addEventListener('change', function() {
+          if (this.checked) {
+            html.setAttribute('data-theme', 'dark');
+          } else {
+            html.setAttribute('data-theme', 'light');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
