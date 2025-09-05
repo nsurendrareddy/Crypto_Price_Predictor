@@ -7,3 +7,4 @@ keras==3.4.1
 matplotlib==3.9.2
 requests==2.32.3
 gunicorn==21.2.0
+cython==3.0.11
