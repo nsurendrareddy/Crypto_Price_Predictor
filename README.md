@@ -1,3 +1,5 @@
 Developed a predictive model to forecast cryptocurrency prices using historical data. The project involved data collection from public APIs like CoinGecko and CoinMarketCap, data cleaning, and preprocessing using Python (Pandas, NumPy). Applied machine learning algorithms to analyze trends and predict future prices, and visualized insights using Matplotlib and Seaborn. Built an interactive dashboard to display top coins, price trends, and news updates, enabling users to make informed investment decisions.
 
 Technologies Used: Python, Pandas, NumPy, Matplotlib, Seaborn, APIs (CoinGecko, CoinMarketCap), HTML/CSS for dashboard.
+
+Site Link : https://crypto-price-predictor-49ts.onrender.com
